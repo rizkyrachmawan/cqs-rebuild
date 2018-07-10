@@ -159,13 +159,13 @@ function save(method, formID, modalID, link, tableName) {
                 deactivateLoader();
             })
             .fail(function (response) {
-                console.log(response);
-                failedNotif(jqXHR,textStatus);
+                failedNotif(response);
                 deactivateLoader();
             });
 }
 
 function successNotif(response){
+    console.log(response);
     $.jGrowl(response.status_txt+', '+response.message, {
         sticky: !1,
         position: "top-right",
@@ -174,7 +174,8 @@ function successNotif(response){
 }
 
 function failedNotif(response){
-    $.jGrowl(reponse.status_txt+', '+response.message, {
+    console.log(response);
+    $.jGrowl(response.responseJSON.status_txt+', '+response.responseJSON.message, {
         sticky: !1,
         position: "top-right",
         theme: "bg-red"

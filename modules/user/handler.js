@@ -24,6 +24,60 @@ function saveUser() {
     save('userMethod', 'form-user', 'modal-user', 'user', 'tableUser');
 }
 
+function editUser(id_user) {
+    loadRole();
+    edit('userMethod', 'form-user', 'modal-user', 'Edit User', 'user', id_user, 'editUserProperties');
+}
+
+function edit(method, formID, modalID, modalTitle, link, id_user, properties) {
+    window[method] = 'update';
+    $('#' + formID)[0].reset();
+    $('.form-group').removeClass('has-error');
+    $('.help-block').empty();
+    $.ajax(methodGetData(link + '/' + id_user))
+            .done(function (response) {
+                saveToken(response.token);
+                window[properties](response);
+                deactivateLoader();
+                $('#' + modalID).modal('show');
+                $('.modal-title').text(modalTitle);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error get data from ajax');
+                deactivateLoader();
+            });
+}
+
+function editUserProperties(response) {
+    $('[name="id"]').val(response.data.id);
+    $('[name="nip"]').val(response.data.nip);
+    $('[name="name"]').val(response.data.name);
+    $('[name="username"]').val(response.data.username);
+    $('[name="password"]').attr("placeholder", "*leave empy if you don't want to change password");
+    $('[name="email"]').val(response.data.email);
+    $('[name="role_id"]').val(response.data.role_name);
+    $('[name="isemployee_txt"]').val(response.data.isemployee_txt);
+    $('#select-role').val(response.data.role_id);
+}
+
+function loadRole() {
+    $.ajax(methodGetData('role'))
+            .done(function (response) {
+                saveToken(response.token);
+                var option = '<option value="0">-- pilih role --</option>';
+                $.each(response.data, function (key, value) {
+                    option += '<option value="' + value.id + '">' + value.name + '</option>';
+                });
+                $('#select-role').html(option);
+                deactivateLoader();
+//                console.log(response);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error get data from ajax');
+                deactivateLoader();
+            });
+}
+
 function dataTablesUserSetting() {
     return {
         "ajax": methodGetData('user'),
